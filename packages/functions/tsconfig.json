@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "lib": ["ES2022"],
+    "noEmit": true,
+    "paths": {
+      "@ev-offer/core": ["../core/src"],
+      "@ev-offer/core/*": ["../core/src/*"],
+      "@ev-offer/db": ["../db/src"],
+      "@ev-offer/db/*": ["../db/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

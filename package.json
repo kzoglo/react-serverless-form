@@ -1,0 +1,52 @@
+{
+  "name": "ev-offer-monorepo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "sst dev",
+    "deploy": "sst deploy",
+    "remove": "sst remove",
+    "typecheck": "pnpm -r run typecheck",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "check": "biome check --write . && pnpm typecheck",
+    "db:generate": "pnpm --filter @ev-offer/db run db:generate",
+    "db:migrate:dev": "pnpm --filter @ev-offer/db run db:migrate:dev",
+    "db:migrate:deploy": "pnpm --filter @ev-offer/db run db:migrate:deploy",
+    "db:studio": "pnpm --filter @ev-offer/db run db:studio",
+    "db:seed": "pnpm --filter @ev-offer/db run db:seed",
+    "db:postgres": "docker run -d --rm --name ev-offer-postgres -p 5432:5432 -v $(pwd)/.sst/storage/postgres:/var/lib/postgresql/data -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password -e POSTGRES_DB=ev_offer_dev postgres:16",
+    "db:postgres:stop": "docker stop ev-offer-postgres",
+    "prepare": "simple-git-hooks"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,css,md}": "biome check --write --no-errors-on-unmatched"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.2",
+    "@types/node": "^22.13.4",
+    "aws-cdk-lib": "2.171.1",
+    "constructs": "10.4.2",
+    "lint-staged": "^16.2.7",
+    "simple-git-hooks": "^2.13.1",
+    "sst": "^3.6.2",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "esbuild",
+      "aws-sdk",
+      "simple-git-hooks"
+    ]
+  }
+}

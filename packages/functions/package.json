@@ -1,0 +1,25 @@
+{
+  "name": "@ev-offer/functions",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ev-offer/core": "workspace:*",
+    "@ev-offer/db": "workspace:*",
+    "@hono/zod-openapi": "^0.18.4",
+    "hono": "^4.7.2",
+    "hono-rate-limiter": "^0.5.3",
+    "jose": "^6.0.8",
+    "sst": "^3.6.2",
+    "unstorage": "^1.17.4",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.147",
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  }
+}

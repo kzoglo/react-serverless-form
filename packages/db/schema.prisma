@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Draft storage (JSONB for autosaved form data) ────────────────────
+
+model OfferDraft {
+  id          String      @id @default(uuid()) @db.Uuid
+  userId      String      @map("user_id")
+  currentStep Int         @default(1) @map("current_step")
+  data        Json        @default("{}")
+  status      DraftStatus @default(draft)
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime    @updatedAt @map("updated_at") @db.Timestamptz
+
+  offer EvOffer?
+
+  @@index([userId])
+  @@index([status])
+  @@map("offer_drafts")
+}
+
+// API values: see draftStatuses in @ev-offer/core/schemas/status
+enum DraftStatus {
+  draft
+  submitted
+
+  @@map("draft_status")
+}
+
+// ── Normalized offer tables (populated on final submit) ──────────────
+
+model EvOffer {
+  id        String      @id @default(uuid()) @db.Uuid
+  userId    String      @map("user_id")
+  draftId   String      @unique @map("draft_id") @db.Uuid
+  status    OfferStatus @default(active)
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime    @updatedAt @map("updated_at") @db.Timestamptz
+
+  draft       OfferDraft @relation(fields: [draftId], references: [id])
+  vehicle     EvVehicle?
+  pricing     EvPricing?
+  photos      EvPhoto[]
+  description String     @default("") @db.Text
+
+  @@index([userId])
+  @@index([status])
+  @@map("ev_offers")
+}
+
+// API values: see offerStatuses in @ev-offer/core/schemas/status
+enum OfferStatus {
+  active
+  sold
+  archived
+
+  @@map("offer_status")
+}
+
+model EvVehicle {
+  id                String @id @default(uuid()) @db.Uuid
+  offerId           String @unique @map("offer_id") @db.Uuid
+  make              String @db.VarChar(100)
+  model             String @db.VarChar(100)
+  year              Int
+  mileageKm         Int    @map("mileage_km")
+  batteryCapacityKwh Float @map("battery_capacity_kwh")
+  rangeKm           Int    @map("range_km")
+  vin               String? @db.VarChar(17)
+  condition         String @db.VarChar(20)
+  color             String @db.VarChar(50)
+
+  offer EvOffer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+
+  @@map("ev_vehicles")
+}
+
+model EvPricing {
+  id             String  @id @default(uuid()) @db.Uuid
+  offerId        String  @unique @map("offer_id") @db.Uuid
+  price          Decimal @db.Decimal(12, 2)
+  currency       String  @db.VarChar(3)
+  negotiable     Boolean @default(false)
+  warrantyMonths Int     @default(0) @map("warranty_months")
+
+  offer EvOffer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+
+  @@map("ev_pricing")
+}
+
+model EvPhoto {
+  id        String  @id @default(uuid()) @db.Uuid
+  offerId   String  @map("offer_id") @db.Uuid
+  url       String  @db.Text
+  sortOrder Int     @default(0) @map("sort_order")
+  caption   String? @db.VarChar(200)
+
+  offer EvOffer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+
+  @@index([offerId])
+  @@map("ev_photos")
+}
