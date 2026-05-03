@@ -45,3 +45,9 @@ temp/
 
 .pnpm-store/
 .cursor/
+
+# Personal / local notes (do not publish)
+*.local.md
+infra/*-notes.md
+packages/db/*-notes.md
+react-serverless-form-development-log/

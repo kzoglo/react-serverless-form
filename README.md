@@ -411,3 +411,15 @@ In a **single-Lambda** design, provisioned concurrency would warm the one “rou
   - **Per-path sizing** – Different memory/timeout per endpoint.
   - **Independent deploys** – Separate teams owning different services.
   - **Blast radius** – Limit impact of a bad deployment to one Lambda.
+
+## Before first push (security)
+
+Run these from the repo root before publishing to GitHub:
+
+1. **Tracked env / key material** — Ensure no real secrets are committed: `git ls-files` should not list `.env` (except documented `*.env.example` patterns you intend to ship), private keys, or credential bundles. Quick filters: `git ls-files | rg -i '\.env$|\.pem$|id_rsa|credentials|\.pfx$'` and `git ls-files | rg '^\.env\.'` — both should be empty unless you explicitly version a non-example env file (avoid).
+2. **Skim docs** — Re-read this README and any other high-churn markdown for pasted tokens; placeholders like `your-api-key` are fine.
+3. **Infra + packages spot-check** — `infra/database.ts` uses `password: "password"` only under SST’s **`dev`** block for local Postgres (Docker-style default), not production Aurora credentials. Lambda and Amplify use env / `import.meta.env` at runtime; keep real values in gitignored `.env` files. Example URLs live in `packages/db/.env.example` by design.
+4. **High-signal grep (optional repeat)** — `git grep -nE 'AKIA[0-9A-Z]{16}|sk_live_|BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{36}' -- infra packages` — expect no matches for AWS access keys, Stripe live keys, PEM blocks, or GitHub PATs.
+5. **Stronger tooling (optional)** — Run [git-secrets](https://github.com/awslabs/git-secrets) or [gitleaks](https://github.com/gitleaks/gitleaks) locally; enable GitHub **secret scanning** on the repository after the first push.
+
+If a secret was ever committed, `.gitignore` alone does not remove it from history—fix with history rewrite (e.g. `git filter-repo`) **before** pushing, or assume the secret is compromised.
