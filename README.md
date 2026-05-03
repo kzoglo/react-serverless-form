@@ -27,15 +27,15 @@ S3 + CloudFront                                         │  - ev_offers        
 ```mermaid
 flowchart LR
   User[Browser]
-  FE[React SPA on S3 + CloudFront]
-  Auth[Cognito User Pool + App Client]
-  Api[API Gateway HTTP API]
-  Fn[Lambda (Hono app)]
-  Db[(Aurora Serverless v2)]
+  FE["React SPA on S3 + CloudFront"]
+  Auth["Cognito User Pool + App Client"]
+  Api["API Gateway HTTP API"]
+  Fn["Lambda (Hono app)"]
+  Db["Aurora Serverless v2"]
   Vpc[VPC]
-  Nat[NAT EC2 t4g.nano]
-  CM[Cloud Map namespace]
-  R53[(Route 53 private zone: sst)]
+  Nat["NAT EC2 t4g.nano"]
+  CM["Cloud Map namespace"]
+  R53["Route 53 private zone: sst"]
 
   User --> FE
   User --> Api
@@ -48,28 +48,28 @@ flowchart LR
   Db --> Vpc
   Nat --> Vpc
   CM --> R53
-  CM -.service discovery records.-> Vpc
+  CM -.->|service discovery records| Vpc
 ```
 
 ### Local development (`sst dev`)
 
 ```mermaid
 flowchart LR
-  Dev[Developer machine]
-  Vite[Vite dev server (frontend)]
-  LocalFn[Local Lambda handler process]
-  LocalPg[(Local PostgreSQL)]
+  Dev["Developer machine"]
+  Vite["Vite dev server (frontend)"]
+  LocalFn["Local Lambda handler process"]
+  LocalPg["Local PostgreSQL"]
 
-  Api[API Gateway HTTP API on AWS]
-  Auth[Cognito on AWS]
-  Vpc[VPC + NAT on AWS]
-  CM[Cloud Map namespace]
-  R53[(Route 53 private zone: sst)]
+  Api["API Gateway HTTP API on AWS"]
+  Auth["Cognito on AWS"]
+  Vpc["VPC + NAT on AWS"]
+  CM["Cloud Map namespace"]
+  R53["Route 53 private zone: sst"]
 
   Dev --> Vite
   Vite --> Auth
   Vite --> Api
-  Api -.SST live bridge.-> LocalFn
+  Api -.->|SST live bridge| LocalFn
   LocalFn --> LocalPg
   Vpc --> CM
   CM --> R53
